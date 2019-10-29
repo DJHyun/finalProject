@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mugs.config.mapper.evaluationAnswerMapper">
+	
+	<sql id = "select-evaluationAnswer-sql">
+		SELECT 
+		   	   evaluation_answer_id,
+			   evaluation_answer_state,
+			   evaluation_answer_year,
+			   evaluation_answer_semester,
+			   stu_id,
+			   subject_id
+			   
+		FROM   evaluation_answer   
+	</sql>
+	
+	<resultMap type="evaluationAnswer" id="evaluationAnswer-resultmap">
+		<id column="evaluation_answer_id" property="evaluationAnswerId"/>
+		<result column="evaluation_answer_state" property="evaluationAnswerState"/>
+		<result column="evaluation_answer_year"	property="evaluationAnswerYear"/>
+		<result column="evaluation_answer_semester" property="evaluationAnswerSemester"/>
+		<result column="stu_id" property="stuId"/>
+		<result column="subject_id" property="subjectId"/>
+	</resultMap>
+	
+	<resultMap type="evaluationAnswer" id="evaluationAnswer-subject-professor-course-resultmap" extends="evaluationAnswer-resultmap">
+		<association property="professor" javaType="com.mugs.vo.Professor" resultMap="com.mugs.config.mapper.professorMapper.professor-user-resultmap"/>
+		<association property="subject" javaType="com.mugs.vo.Subject" resultMap="com.mugs.config.mapper.subjectMapper.subject-basic-resultmap"/>
+		<association property="course" javaType="com.mugs.vo.Course" resultMap="com.mugs.config.mapper.courseMapper.course-resultmap"/>
+	</resultMap> 
+	
+	<resultMap type="evaluationAnswer" id="evaluationAnswer-subject-professor-resultmap" extends="evaluationAnswer-resultmap">
+		<association property="professor" javaType="com.mugs.vo.Professor" resultMap="com.mugs.config.mapper.professorMapper.professor-user-resultmap"/>
+		<association property="subject" javaType="com.mugs.vo.Subject" resultMap="com.mugs.config.mapper.subjectMapper.subject-basic-resultmap"/>
+	</resultMap> 
+	
+	
+	<!-- 평가응답 등록 -->
+	<insert id="insertEvaluationAnswer" parameterType="evaluationAnswer">
+		<selectKey order="BEFORE" keyProperty="evaluationAnswerId" resultType="int">
+		SELECT EVALUATION_ANSWER_ID_SEQ.nextval
+		FROM   dual
+		</selectKey>
+		INSERT INTO evaluation_answer
+		VALUES  (
+				#{evaluationAnswerId},
+				#{evaluationAnswerState},
+				#{evaluationAnswerYear},
+				#{evaluationAnswerSemester},
+				#{stuId},
+				#{subjectId}
+				)
+	</insert>
+	
+	<!-- 평가응답 수정 -->
+	<update id="updateEvaluationAnswerById" parameterType="evaluationAnswer">
+		UPDATE evaluation_answer
+		SET	  
+			   evaluation_answer_state = #{evaluationAnswerState},
+			   evaluation_answer_year=#{evaluationAnswerYear},
+			   evaluation_answer_semester=#{evaluationAnswerSemester},
+			   stu_id=#{stuId},
+			   subject_id=#{subjectId}
+		WHERE   evaluation_answer_id = #{evaluationAnswerId}
+	</update>
+	
+	<!-- 평가응답 평가 id로 삭제 -->
+	<delete id="deleteEvaluationAnswerById" parameterType="int">
+		DELETE FROM evaluation_answer
+		WHERE  evaluation_answer_id = #{evaluationAnswerId}			`
+	</delete>
+	
+	<!-- 평가응답 전체조회 -->
+	<select id="selectEvaluationAnswerAll" 
+			resultType="java.util.ArrayList" 
+			resultMap="evaluationAnswer-resultmap">
+		<include refid="select-evaluationAnswer-sql"/>
+	</select>
+	
+	<!-- 평가응답 id로 조회 -->
+	<select id="selectEvaluationAnswerById" 
+		    resultMap="evaluationAnswer-resultmap" 
+		    parameterType="int">
+		<include refid="select-evaluationAnswer-sql"/>
+		WHERE evaluation_answer_id = #{evaluationAnswerId}
+	</select>
+	
+	<select id="selectEvaluationAnswerValueList" resultMap="evaluationAnswer-subject-professor-course-resultmap" parameterType="map">
+      select s.subject_name, e.evaluation_answer_state, u.users_name, e.subject_id, e.evaluation_answer_year, 
+      		 e.evaluation_answer_semester, p.pro_Id
+	  from evaluation_answer e, subject s, professor p, professor_subject q, users u
+	  where e.subject_id = s.subject_id
+	  and s.subject_id=q.subject_id
+	  and q.pro_Id=p.pro_Id
+      and p.pro_id=u.users_Id
+     and e.evaluation_answer_year=q.pro_subject_year
+     and e.evaluation_answer_semester=q.pro_subject_semester
+     and e.STU_ID=#{loginId}
+     and e.evaluation_answer_semester =#{nowSemester}
+     and e.evaluation_answer_year=#{nowYear}
+   </select> 
+   
+   	<!-- 설문응답에 응하였을 시, 설문응답상태가 'N'에서 'Y'로 바뀌는 update문 -->
+	<update id="updateEvaluationAnswerState" parameterType="map">
+		UPDATE evaluation_answer
+		SET    evaluation_answer_state='Y'
+		WHERE  subject_id = #{subjectId}
+		AND    stu_id = #{loginId}
+		AND    evaluation_answer_year = #{nowYear}
+		AND    evaluation_answer_semester = #{nowSemester}
+	</update>
+	
+   <select id="selectEvaluationAnswerValue" parameterType="map" resultMap="evaluationAnswer-subject-professor-resultmap" >
+<!-- 		SELECT s.subject_id, s.subject_name, u.users_name, e.evaluation_answer_state
+		FROM   subject s, professor p, users u, evaluation_answer e
+		WHERE  e.stu_id = #{nowId}
+		AND    e.evaluation_answer_year = #{nYear}
+		AND    e.evaluation_answer_semester = #{nSemester}
+		AND    e.subject_id = s.subject_id
+		AND    s.subject_id = #{subjctId} -->
+		SELECT s.subject_id, s.subject_name, u.users_name, e.evaluation_answer_state
+		FROM   subject s, professor p, users u, evaluation_answer e
+		WHERE  e.stu_id = #{nowId}
+		AND    e.evaluation_answer_year = #{nYear}
+		AND    e.evaluation_answer_semester = #{nSemester}
+		AND    e.subject_id = s.subject_id
+		AND    s.subject_id = #{subjctId}
+		AND    p.pro_id = u.users_id
+ 
+	</select>
+	
+	<!-- 
+		By Baek.J.H
+		수강신청 취소를 하면 수강신청시 함께 등록했던 평가등록 여부 데이터도 삭제 
+	-->
+	<delete id="deleteEvaluationAnswerByEtc" parameterType="map">
+		DELETE FROM evaluation_answer
+		WHERE  evaluation_answer_year=#{nowYear}
+		and    evaluation_answer_semester=#{semester}
+		and    stu_id=#{stuId}
+		and    subject_id=#{subjectId}
+	</delete>
+	
+</mapper>

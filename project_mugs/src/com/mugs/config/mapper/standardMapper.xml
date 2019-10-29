@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mugs.config.mapper.standardMapper">
+
+	<sql id="select-standard">
+	SELECT standard_year,
+	major_id,
+	standard_min_credit,
+	standard_max_credit,
+	standard_min_scholarship,
+	standard_delay_min_credit,
+	standard_delay_max_credit
+	FROM STANDARD
+	</sql>
+
+	<resultMap type="standard" id="standard-basic-resultmap">
+		<id column="STANDARD_YEAR" property="standardYear"/>
+		<result column="MAJOR_ID" property="majorId"/>
+		<result column="STANDARD_MIN_CREDIT" property="standardMinCredit"/>
+		<result column="STANDARD_MAX_CREDIT" property="standardMaxCredit"/>
+		<result column="STANDARD_MIN_SCHOLARSHIP" property="standardMinScholarship"/>
+		<result column="STANDARD_DELAY_MIN_CREDIT" property="standardDelayMinCredit"/>
+		<result column="STANDARD_DELAY_MAX_CREDIT" property="standardDelayMaxCredit"/>
+		<result column="MAJOR_NAME" property="majorName"/>
+	</resultMap>
+	
+	
+
+
+	<insert id="insertStandard" parameterType="standard">
+		INSERT INTO STANDARD
+		VALUES(#{standardYear}, 
+			   #{majorId}, 
+			   #{standardMinCredit},
+			   #{standardMaxCredit},
+			   #{standardMinScholarship},
+			   #{standardDelayMinCredit},
+			   #{standardDelayMaxCredit})
+	</insert>
+
+
+	<update id="updateStandard" parameterType="standard">
+		UPDATE STANDARD
+		SET standard_year = #{standardYear},
+			major_id = #{majorId},
+			standard_min_credit = #{standardMinCredit},
+			standard_max_credit = #{standardMaxCredit},
+			standard_min_scholarship = #{standardMinScholarship},
+			standard_delay_min_credit = #{standardDelayMinCredit},
+			standard_delay_max_credit = #{standardDelayMaxCredit}
+		WHERE	major_id=#{majorId}
+		AND 	standard_year=#{standardYear}
+	</update>
+
+
+
+	<delete id="deleteStandard" parameterType="int">
+		DELETE FROM STANDARD
+		WHERE standard_year = #{standardYear}
+		AND	  major_id = #{majorId}
+	</delete>
+
+
+
+	<select id="selectStandardById" resultMap="standard-basic-resultmap" parameterType="map">
+		<include refid="select-standard"/>
+		WHERE standard_year = #{standardYear}
+		AND   major_id = #{majorId}
+	</select>	
+
+
+	<select id="selectStandardList" resultMap="standard-basic-resultmap">
+		<include refid="select-standard"/>
+	</select>
+	
+	<select id="selectMajorList" resultType="String">
+		SELECT DISTINCT m.major_name
+		FROM   major m, standard d
+		WHERE  m.major_id = d.major_id 
+	</select>
+	
+	<select id="selectYearListByMajorId" parameterType="int" resultMap="standard-basic-resultmap">
+		SELECT DISTINCT standard_year
+		FROM   standard
+		WHERE  major_id = #{value}
+	</select>
+	
+	<select id="selectStandardValue" parameterType="map" resultMap="standard-basic-resultmap">
+	 	SELECT d.standard_year, d.standard_min_credit, d.standard_max_credit, d.standard_min_scholarship, d.standard_delay_min_credit, d.standard_delay_max_credit
+		FROM   standard d, college c, major m
+		WHERE  d.major_id = m.major_id
+		and    c.college_id = m.college_id
+		and    m.college_id = #{collegeId}
+		AND    d.major_id = #{majorId}
+		AND    d.standard_year = #{standardYear}		
+	</select>
+	
+	<select id="selectListByMajorId" parameterType="int" resultMap="standard-basic-resultmap">
+		SELECT s.standard_year,
+			   s.standard_min_credit,
+			   s.standard_max_credit,
+			   s.standard_min_scholarship,
+			   s.standard_delay_min_credit,
+			   s.standard_delay_max_credit,
+			   s.major_id,
+			   m.major_name
+		FROM standard s, major m
+		WHERE s.major_id = m.major_id AND 
+		m.major_id = #{value}
+	</select>
+
+</mapper>

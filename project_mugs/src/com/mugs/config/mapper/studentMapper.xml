@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mugs.config.mapper.studentMapper">
+
+	<sql id="select-student">
+		SELECT stu_id,
+			   stu_course,
+			   stu_army,
+			   stu_admission_date,
+			   stu_graduation_date,
+			   stu_register_state,
+			   stu_student_state,
+			   stu_grade,
+			   stu_graduation_exam,
+			   stu_early_graduation,
+			   stu_semester,
+			   major_id,
+			   major_dual_id,
+			   major_minor_id
+		FROM   STUDENT
+	</sql>
+
+	<resultMap type="student" id="student-basic-resultmap">
+		<id column="stu_id" property="stuId"/>
+		<result column="stu_course" property="stuCourse"/>
+		<result column="stu_army" property="stuArmy"/>
+		<result column="stu_admission_date" property="stuAdmissionDate"/>
+		<result column="stu_graduation_date" property="stuGraduationDate"/>
+		<result column="stu_register_state" property="stuRegisterState"/>
+		<result column="stu_student_state" property="stuStudentState"/>
+		<result column="stu_grade" property="stuGrade"/>
+		<result column="stu_graduation_exam" property="stuGraduationExam"/>
+		<result column="stu_early_graduation" property="stuEarlyGraduation"/>
+		<result column="stu_semester" property="stuSemester"/>
+		<result column="major_id" property="majorId"/>
+		<result column="major_dual_id" property="majorDualId"/>
+		<result column="major_minor_id" property="majorMinorId"/>
+		<result column="major_name" property="majorName"/>
+		<result column="major_name" property="majorDualName"/>
+		<result column="major_name" property="majorMinorName"/>	
+	</resultMap>
+
+	<resultMap id="student-user-resultmap" type="student" extends="student-basic-resultmap">
+      <result column="users_id" property="usersId" />
+      <result column="users_password" property="usersPassword" />
+      <result column="users_name" property="usersName" />
+      <result column="users_eng_name" property="usersEngName" />
+      <result column="users_rrn" property="usersRRN" />
+      <result column="users_email" property="usersEmail" />
+      <result column="users_phone_num" property="usersPhoneNum" />
+      <result column="users_cell_num" property="usersCellNum" />
+      <result column="users_national" property="usersNational" />
+      <result column="users_current_addr" property="usersCurrentAddr" />
+      <result column="users_born_addr" property="usersBornAddr" />
+      <result column="users_enable" property="usersEnable" />
+      <result column="users_photo" property="usersPhoto" />
+   </resultMap>
+
+
+	<insert id="insertStudent" parameterType="student">
+		INSERT INTO STUDENT
+		VALUES (#{stuId}, #{stuCourse}, #{stuArmy}, 
+			   #{stuAdmissionDate}, 
+			   #{stuGraduationDate}, 
+			   #{stuRegisterState}, 
+			   #{stuStudentState}, 
+			   #{stuGrade}, 
+			   #{stuGraduationExam}, 
+			   #{stuEarlyGraduation}, 
+			   #{stuSemester},
+			   #{majorId}, 
+			   #{majorDualId}, 
+			   #{majorMinorId}
+			   )
+	</insert>
+	
+
+	<update id="updateStudent" parameterType="student">
+		UPDATE STUDENT
+		SET
+			stu_course = #{stuCourse}, 
+			stu_army = #{stuArmy}, 
+			stu_admission_date = #{stuAdmissionDate}, 
+			stu_graduation_date = #{stuGraduationDate}, 
+			stu_register_state = #{stuRegisterState}, 
+			stu_student_state = #{stuStudentState}, 
+			stu_grade = #{stuGrade}, 
+			stu_graduation_exam = #{stuGraduationExam}, 
+			stu_early_graduation = #{stuEarlyGraduation}, 
+			stu_semester = #{stuSemester}, 
+			major_dual_id = #{majorDualId}, 
+			major_minor_id = #{majorMinorId},
+			major_id = #{majorId}
+		where stu_id = #{stuId}
+	</update>
+	
+	
+	<delete id="deleteStudent" parameterType="java.lang.String">
+		DELETE FROM STUDENT
+		WHERE stu_id = #{value}
+	</delete>	
+	
+	
+
+	<select id="selectStudentById" resultMap="student-basic-resultmap" parameterType="java.lang.String">
+		<include refid="select-student"/>
+		WHERE stu_id = #{value}
+	</select>	
+	
+	
+
+	<select id="selectStudentList" resultMap="student-basic-resultmap">
+		<include refid="select-student"/>
+	</select>
+	
+	<!-- 병문 : studentMapper -->
+	<!-- 병문 : 학생- 학과 join mapper -->
+	<resultMap type="student" id="student-major-resultmap" extends="student-basic-resultmap">		
+		
+      	<result column="users_name" property="usersName" />
+      	<result column="users_eng_name" property="usersEngName" />
+      	<result column="users_rrn" property="usersRRN" />
+      	<result column="users_email" property="usersEmail" />
+      	<result column="users_phone_num" property="usersPhoneNum" />
+      	<result column="users_cell_num" property="usersCellNum" />
+      	<result column="users_national" property="usersNational" />
+      	<result column="users_current_addr" property="usersCurrentAddr" />
+      	<result column="users_born_addr" property="usersBornAddr" />
+      	<result column="users_enable" property="usersEnable" />
+      	<result column="users_photo" property="usersPhoto" />
+      	
+		<!-- 1:1 참조 , 결과값을 setMainMajor한다. -->
+		<!-- major_name 컬럼의 값을 javaType인 major 객체에 setMajorName한다.-->
+		<!--학생의 주전공-->
+		<association javaType="major" property="mainMajor">
+			<result column="mainMajorName" property="majorName"/>
+		</association>
+		
+		<!--학생의 복수전공 -->		
+		<association javaType="major" property="multiMajor">
+			<result column="subMajorName" property="majorName"/> 				
+		</association>
+		
+		<!--학생의 부전공-->
+		<association javaType="major" property="subMajor">
+		<result column="multiMajorName" property="majorName"/>
+		</association>
+			
+	</resultMap>
+	
+	<select id="selectStudentAllInfoByJoin" resultMap="student-major-resultmap" parameterType="student">
+		SELECT		s.stu_id,
+					s.stu_course,
+			   	   	s.stu_army,
+			    	s.stu_admission_date,
+			   		s.stu_graduation_date,
+			   		s.stu_register_state,
+				   	s.stu_student_state,
+				  	s.stu_grade,
+				   	s.stu_graduation_exam,
+				   	s.stu_early_graduation,
+				   	s.stu_semester,
+				   	s.major_id,
+				   	s.major_dual_id,
+				   	s.major_minor_id,
+				   	u.users_name,
+			   		u.users_eng_name,
+			   		u.users_rrn,
+			  		u.users_email,
+			   		u.users_phone_num,
+		       		u.users_cell_num,
+			   		u.users_national,
+			   		u.users_current_addr,
+			   		u.users_born_addr,
+			   		u.users_enable,
+			   		u.users_photo,
+				   	main.major_name mainMajorName,
+				   	sub.major_name subMajorName,
+				   	multi.major_name multiMajorName 				   	
+		FROM 		student s, 
+					major main , 
+					major sub , 
+					major multi , 
+					users u					
+		WHERE		s.major_id 		 = main.major_id
+		AND			s.major_dual_id  = multi.major_id(+)
+		AND			s.major_minor_id = sub.major_id(+)
+		AND			u.users_id = s.stu_id 
+		AND			u.users_id = #{stuId} 	
+	</select>
+
+	<select id="selectStuGraduationExam" resultType="string" parameterType="string">
+	SELECT 	stu_graduation_exam
+	FROM 	student
+	WHERE 	stu_id = #{stuId}
+	</select>
+	<!-- End BM -->
+		
+	<select id="selectStudentInfoByJoin" resultMap="student-user-resultmap" parameterType="String">
+
+	SELECT	   s.stu_id,
+		  	   s.stu_course,
+		  	   s.stu_army,
+		  	   s.stu_admission_date,
+			   s.stu_graduation_date,
+			   s.stu_register_state,
+			   s.stu_student_state,
+			   s.stu_grade,
+			   s.stu_graduation_exam,
+			   s.stu_early_graduation,
+			   s.stu_semester,
+			   s.major_id,
+			   s.major_dual_id,
+			   s.major_minor_id,
+		   	   u.users_id, 
+		  	   u.users_password, 
+		  	   u.users_name,
+		   	   u.users_eng_name,
+		   	   u.users_rrn,
+		   	   u.users_email,
+		   	   u.users_phone_num,
+		  	   u.users_cell_num,
+		  	   u.users_national,
+		  	   u.users_current_addr,
+		  	   u.users_born_addr,
+		       u.users_enable,
+	           u.users_photo
+		FROM   student s, users u
+		WHERE  s.stu_id = u.users_id
+		AND    s.stu_id = #{value}
+	</select>
+	
+	<select id="selectStudentByName" resultMap="student-user-resultmap" parameterType="String">
+		SELECT s.stu_id,  	   
+		  	   u.users_name, u.users_rrn, u.users_email
+		FROM   student s, users u
+		WHERE  s.stu_id = u.users_id 
+		AND    u.users_name Like '%'||#{value}||'%'
+	</select>
+	 
+	<select id="selectStudentInfoForMajorById" resultMap="student-user-resultmap" parameterType="String">
+		SELECT m.major_name, s.major_id
+		FROM   student s, major m
+		WHERE  s.major_id = m.major_id
+		AND    s.stu_id = #{value}
+	</select>
+	
+	<select id="selectProfessorInfoForMajorDualById" resultMap="student-user-resultmap" parameterType="String">
+		SELECT m.major_name, s.major_dual_id
+		FROM   student s, major m
+		WHERE  s.major_dual_id = m.major_id
+		AND    s.stu_id = #{value}
+	</select>
+	
+	<select id="selectProfessorInfoForMajorMinorById" resultMap="student-user-resultmap" parameterType="String">
+		SELECT m.major_name, s.major_minor_id
+		FROM   student s, major m
+		WHERE  s.major_minor_id = m.major_id
+		AND    s.stu_id = #{value}
+	</select>
+	
+</mapper>

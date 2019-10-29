@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	<mvc:annotation-driven/>
+	<context:component-scan base-package="com.mugs.controller.admin" />
+
+	<!--학생 관리  -->
+	<mvc:view-controller view-name="admin/student/insert_student.tiles" path="insert_student.do"/>
+	<mvc:view-controller view-name="admin/student/select_student.tiles" path="select_student.do"/>
+	<mvc:view-controller view-name="admin/student/update_student.tiles" path="update_student.do"/>
+
+	<!--교수 관리  -->
+	<mvc:view-controller view-name="admin/professor/insert_professor.tiles" path="insert_professor.do"/>
+	<mvc:view-controller view-name="admin/professor/select_professor.tiles" path="select_professor.do"/>
+	<mvc:view-controller view-name="admin/professor/update_professor.tiles" path="update_professor.do"/>
+
+	<!--과목 관리  -->
+	<mvc:view-controller view-name="admin/subject/insert_subject.tiles" path="insert_subject.do"/>
+	<mvc:view-controller view-name="admin/subject/select_subject.tiles" path="select_subject.do"/>
+	<mvc:view-controller view-name="admin/subject/update_subject.tiles" path="update_subject.do"/>
+
+	<!--학과 관리  -->
+	<mvc:view-controller view-name="admin/major/insert_major.tiles" path="insert_major.do"/>
+	<mvc:view-controller view-name="admin/major/select_major.tiles" path="select_major.do"/>
+	<mvc:view-controller view-name="admin/major/update_major.tiles" path="update_major.do"/>
+	<mvc:view-controller view-name="admin/major/select_major_info.tiles" path="select_major_info.do"/>
+	
+	<!--단과대학 관리  -->
+	<mvc:view-controller view-name="admin/college/insert_college.tiles" path="insert_college.do"/>
+	<mvc:view-controller view-name="admin/college/select_college.tiles" path="select_college.do"/>
+	<mvc:view-controller view-name="admin/college/update_college.tiles" path="update_college.do"/>
+	
+	<!--건물 관리  -->
+	<mvc:view-controller view-name="admin/building/insert_building.tiles" path="insert_building.do"/>
+	<mvc:view-controller view-name="admin/building/select_building.tiles" path="select_building.do"/>
+	<mvc:view-controller view-name="admin/building/update_building.tiles" path="update_building.do"/>
+	<mvc:view-controller view-name="admin/building/select_building_info.tiles" path="select_building_info.do"/>
+	
+	<!--강의실 관리  -->
+	<mvc:view-controller view-name="admin/room/insert_room.tiles" path="insert_room.do"/>
+	<mvc:view-controller view-name="admin/room/update_room.tiles" path="update_room.do"/>
+	
+
+	<!--졸업학점 관리  -->
+	<mvc:view-controller view-name="admin/graduationcredit/insert_graduation_credit.tiles" path="insert_graduation_credit.do"/>
+	<mvc:view-controller view-name="admin/graduationcredit/update_graduation_credit.tiles" path="update_graduation_credit.do"/>
+
+	<!--공지사항 관리  -->
+	<mvc:view-controller view-name="admin/notice/select_notice.tiles" path="select_notice.do"/>
+	<mvc:view-controller view-name="admin/notice/insert_notice.tiles" path="insert_notice.do"/>
+	<mvc:view-controller view-name="admin/notice/update_notice.do" path="update_notice.tiles"/>
+	
+	<!--수강 기준 학점 관리  -->
+	<mvc:view-controller view-name="admin/standard/insert_standard.tiles" path="insert_standard.do"/>
+	<mvc:view-controller view-name="admin/standard/update_standard.tiles" path="update_standard.do"/>
+	
+	<!--신청 현황 관리  -->
+	<mvc:view-controller view-name="admin/student/select_credit_give_up.tiles" path="select_credit_give_up.do"/>
+	<mvc:view-controller view-name="admin/student/select_leave_return_application.tiles" path="select_leave_return_application.do"/>
+	<mvc:view-controller view-name="admin/student/select_academic_probation.tiles" path="select_academic_probation.do"/>
+	
+</beans>
